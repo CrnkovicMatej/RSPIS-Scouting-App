@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ActivityEntityRepository extends JpaRepository<ActivityEntity, Integer> {
     Page<ActivityEntity> findPageByType(ActivityEntity.ActivityType type, Pageable pageable);
+    Page<ActivityEntity> findPageByStatus(ActivityEntity.ActivityStatus status, Pageable pageable);
 }

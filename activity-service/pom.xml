@@ -53,7 +53,8 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>test</scope>
+			<scope>runtime</scope>
+			<!-- obavezno promijeni u test -->
 		</dependency>
 		<dependency>
 			<groupId>jakarta.persistence</groupId>

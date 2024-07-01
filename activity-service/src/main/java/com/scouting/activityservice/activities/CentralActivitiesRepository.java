@@ -29,7 +29,13 @@ public class CentralActivitiesRepository {
         org.springframework.data.domain.Page<ActivityEntity> resultPage;
         var pageRequest = PageRequest.of(activityPageQuery.page(), activityPageQuery.size(), Sort.by("id"));
 
-        if (activityPageQuery.type().isPresent() ) {
+        if(activityPageQuery.status().isPresent()){
+            resultPage = activityEntityRepository.findPageByStatus(
+                    activityPageQuery.status().get(),
+                    pageRequest
+            );
+        }
+        else if (activityPageQuery.type().isPresent() ) {
             resultPage = activityEntityRepository.findPageByType(
                     activityPageQuery.type().get(),
                     pageRequest
@@ -54,17 +60,18 @@ public class CentralActivitiesRepository {
             throw InvalidActivityException.becauseTheIdIsProvided();
         }
 
-        var libraryEntity = new ActivityEntity(
+        var activityEntity = new ActivityEntity(
                 null,
                 activity.name(),
                 activity.startDate(),
                 activity.endDate(),
                 activity.price(),
                 activity.type(),
+                activity.status(),
                 activity.description()
         );
 
-        return save(libraryEntity);
+        return save(activityEntity);
     }
 
     private Activity save(ActivityEntity activityEntity) {

@@ -11,6 +11,9 @@ public record Activity (
         LocalDate endDate,
         BigDecimal price,
         ActivityEntity.ActivityType type,
+
+        ActivityEntity.ActivityStatus status,
+
         String description
 ){
     public static Activity fromEntity(ActivityEntity entity) {
@@ -22,6 +25,7 @@ public record Activity (
                 entity.getEndDate(),
                 entity.getPrice(),
                 entity.getType(),
+                entity.getStatus(),
                 entity.getDescription()
         );
     }

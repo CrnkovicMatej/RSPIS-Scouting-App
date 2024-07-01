@@ -4,6 +4,7 @@ import com.scouting.activityservice.activities.storage.ActivityEntity;
 
 import java.util.Optional;
 public record ActivityPageQuery (
+        Optional<ActivityEntity.ActivityStatus> status,
         Optional<ActivityEntity.ActivityType> type,
         int page,
         int size

@@ -13,9 +13,9 @@ import java.time.LocalDate;
 
 @Entity
 @Table(
-        name = "activities",
+        name = "activities"
         //uniqueConstraints = {@UniqueConstraint(columnNames = {"group_id", "artifact_id"})},
-        schema = "activity_repository"
+        //schema = "activity_repository"
 )
 @Getter
 @Setter
@@ -26,6 +26,10 @@ public class ActivityEntity {
 
     public enum ActivityType {
         PERSONAL, LOCAL, CITY, NATIONAL, INTERNATIONAL
+    }
+
+    public enum ActivityStatus{
+        PAST, ACTIVE, PLANNING
     }
 
     @Id
@@ -48,6 +52,10 @@ public class ActivityEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "type")
     private ActivityType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "status")
+    private ActivityStatus status;
 
     @Column(name = "description")
     private String description;
