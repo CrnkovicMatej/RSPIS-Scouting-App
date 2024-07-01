@@ -1,0 +1,22 @@
+spring.application.name: user-service
+
+spring:
+  sql:
+    init:
+      mode: always
+  jackson:
+    time-zone: UTC
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+    defer-datasource-initialization: true
+    datasource:
+      url: jdbc:mariadb://user-service-db:3306/user-service
+      username: root
+      password: pass
+      driver-class-name: org.mariadb.jdbc.Driver
+

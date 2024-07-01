@@ -1,0 +1,40 @@
+services:
+  # user-service-db:
+  #   image: mariadb:lts-jammy
+  #   restart: unless-stopped
+  #   user: ${UID}:${GID}
+  #   environment:
+  #     MARIADB_DATABASE: user-service
+  #     MARIADB_ROOT_PASSWORD: ${MARIADB_LIBRARY_REPOSITORY_ROOT_PASSWORD}
+  #   volumes:
+  #     - ./mariadb/data:/var/lib/mysql:Z
+  #   healthcheck:
+  #     interval: 10s
+  #     retries: 10
+  #     timeout: 30s
+  #     test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+
+  
+  api-gateway:
+    build: ./api-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    # healthcheck:
+    #   interval: 10s
+    #   retries: 10
+    #   timeout: 30s
+    #   test: "curl --fail --silent localhost:8080/actuator/health | grep UP || exit 1"
+
+  activity-service:
+    build: ./activity-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+  
+  # user-service:
+  #   build: ./user-service
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8082:8080"
+

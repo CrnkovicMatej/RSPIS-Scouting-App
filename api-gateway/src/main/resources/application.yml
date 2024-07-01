@@ -1,0 +1,12 @@
+server:
+  port: 8080
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: activity-service
+          uri: http://activity-service:8081
+          predicates:
+            - Path=/pong/*
+          filters:
+            - BasicAuthGatewayFilter
