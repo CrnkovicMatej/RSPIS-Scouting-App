@@ -9,5 +9,5 @@ RUN mvn clean package -Dmaven.test.skip=true
 FROM eclipse-temurin:21
 WORKDIR /opt/activity-service
 COPY --from=build /opt/activity-service/target/activity-service-0.0.1-SNAPSHOT.jar ./activity-service.jar
-EXPOSE 8080
+EXPOSE 8081
 CMD ["java", "-jar", "activity-service.jar"]

@@ -1,20 +1,4 @@
-services:
-  # user-service-db:
-  #   image: mariadb:lts-jammy
-  #   restart: unless-stopped
-  #   user: ${UID}:${GID}
-  #   environment:
-  #     MARIADB_DATABASE: user-service
-  #     MARIADB_ROOT_PASSWORD: ${MARIADB_LIBRARY_REPOSITORY_ROOT_PASSWORD}
-  #   volumes:
-  #     - ./mariadb/data:/var/lib/mysql:Z
-  #   healthcheck:
-  #     interval: 10s
-  #     retries: 10
-  #     timeout: 30s
-  #     test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
-
-  
+services:  
   api-gateway:
     build: ./api-gateway
     restart: unless-stopped
@@ -29,12 +13,85 @@ services:
   activity-service:
     build: ./activity-service
     restart: unless-stopped
-    ports:
-      - "8081:8081"
+    user: ${UID}:${GID}
+    depends_on:
+      activity-service-db:
+        condition: service_healthy
+      activity-cache:
+        condition: service_healthy
+    environment:
+      MARIADB_ACTIVITY_REPOSITORY_ROOT_PASSWORD: ${MARIADB_ACTIVITY_REPOSITORY_ROOT_PASSWORD}
+      URLS_CACHE_REDIRECT_PASSWORD: ${URLS_CACHE_REDIRECT_PASSWORD}
+    # ports:
+    #   - "8081:8081"
+
+  activity-cache:
+    image: redis/redis-stack:7.2.0-v10
+    restart: unless-stopped
+    environment:
+      REDIS_ARGS: "--requirepass ${URLS_CACHE_DEFAULT_PASSWORD} --user redirect on >${URLS_CACHE_REDIRECT_PASSWORD} ~* allcommands --user default on >${URLS_CACHE_DEFAULT_PASSWORD} ~* allcommands"
+    healthcheck:
+      interval: 10s
+      retries: 10
+      timeout: 30s
+      test: [ "CMD", "redis-cli", "-a", "${URLS_CACHE_DEFAULT_PASSWORD}", "--raw", "incr", "ping" ]
   
-  # user-service:
-  #   build: ./user-service
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8082:8080"
+  user-service:
+    build: ./user-service
+    restart: unless-stopped
+    user: ${UID}:${GID}
+    depends_on:
+      user-service-db:
+        condition: service_healthy
+    environment:
+      MARIADB_USER_REPOSITORY_ROOT_PASSWORD: ${MARIADB_USER_REPOSITORY_ROOT_PASSWORD}
+      user1_api_key: ${user1_api_key}
+      user2_api_key: ${user2_api_key}
+      user3_api_key: ${user3_api_key}
+      user4_api_key: ${user4_api_key}
+    # ports:
+    #   - "8082:8082"
+
+  activity-planning-service:
+    build: ./activity-planning-service
+    restart: unless-stopped
+    # ports:
+    #   - "8084:8084"
+    environment:
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - DEPLOYMENT_NAME=${DEPLOYMENT_NAME}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+
+  user-service-db:
+    image: mariadb:lts-jammy
+    restart: unless-stopped
+    user: ${UID}:${GID}
+    environment:
+      MARIADB_DATABASE: user_service_repository
+      MARIADB_ROOT_PASSWORD: ${MARIADB_USER_REPOSITORY_ROOT_PASSWORD}
+    volumes:
+      - ./user-service-db/data:/var/lib/mysql:Z
+      #- ./user-service-db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      interval: 10s
+      retries: 10
+      timeout: 30s
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+
+  activity-service-db:
+    image: mariadb:lts-jammy
+    restart: unless-stopped
+    user: ${UID}:${GID}
+    environment:
+      MARIADB_DATABASE: activity_service_repository
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ACTIVITY_REPOSITORY_ROOT_PASSWORD}
+    volumes:
+      - ./activity-service-db/data:/var/lib/mysql:Z
+      #- ./activity-service-db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      interval: 10s
+      retries: 10
+      timeout: 30s
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+
 

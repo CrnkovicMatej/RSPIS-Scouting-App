@@ -9,5 +9,5 @@ RUN mvn clean package -Dmaven.test.skip=true
 FROM eclipse-temurin:21
 WORKDIR /opt/user-service
 COPY --from=build /opt/user-service/target/user-service-0.0.1-SNAPSHOT.jar ./user-service.jar
-EXPOSE 8080
+EXPOSE 8082
 CMD ["java", "-jar", "user-service.jar"]

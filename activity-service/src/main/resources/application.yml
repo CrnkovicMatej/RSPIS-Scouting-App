@@ -1,0 +1,31 @@
+spring.application.name: activity-service
+server:
+  port: 8081
+
+spring:
+  sql:
+    init:
+      mode: always
+  jackson:
+    time-zone: UTC
+  data:
+    redis:
+      host: activity-cache
+      port: 6379
+      database: 0
+      username: redirect
+      password: ${URLS_CACHE_REDIRECT_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        dialect: org.hibernate.dialect.MariaDBDialect
+    defer-datasource-initialization: true
+  datasource:
+    url: jdbc:mariadb://activity-service-db:3306/activity_service_repository
+    username: root
+    password: ${MARIADB_ACTIVITY_REPOSITORY_ROOT_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver

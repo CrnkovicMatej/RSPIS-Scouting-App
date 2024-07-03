@@ -13,9 +13,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(
-        name = "activities"
-        //uniqueConstraints = {@UniqueConstraint(columnNames = {"group_id", "artifact_id"})},
-        //schema = "activity_repository"
+        name = "activities",
+        schema = "activity_service_repository"
 )
 @Getter
 @Setter

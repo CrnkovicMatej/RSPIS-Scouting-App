@@ -6,6 +6,10 @@ import com.scouting.activityservice.activities.storage.ActivityEntity;
 import com.scouting.activityservice.activities.storage.ActivityEntityRepository;
 import com.scouting.activityservice.activities.utils.ActivityPageQuery;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
 import com.scouting.activityservice.activities.utils.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,12 +23,14 @@ public class CentralActivitiesRepository {
         this.activityEntityRepository = activityEntityRepository;
     }
 
+    @Cacheable(value = "activitiesCache", key = "#activityID")
     public Activity getActivity(Integer activityID) {
         return activityEntityRepository.findById(activityID)
                 .map(Activity::fromEntity)
                 .orElseThrow(() -> ActivityNotFoundException.becauseTheActivityDoesNotExist(activityID));
     }
 
+    @Cacheable(value = "activitiesCache", key = "#activityPageQuery.toString()")
     public Page<Activity> findAllActivities(ActivityPageQuery activityPageQuery) {
         org.springframework.data.domain.Page<ActivityEntity> resultPage;
         var pageRequest = PageRequest.of(activityPageQuery.page(), activityPageQuery.size(), Sort.by("id"));
@@ -55,6 +61,7 @@ public class CentralActivitiesRepository {
         );
     }
 
+    @CachePut(value = "activitiesCache", key = "#result.id")
     public Activity createActivity(Activity activity) {
         if (activity.id() != null) {
             throw InvalidActivityException.becauseTheIdIsProvided();
@@ -82,5 +89,9 @@ public class CentralActivitiesRepository {
         } catch (Exception exception) {
             throw ActivitySavingException.becauseOfExceptionDuringSaving(exception);
         }
+    }
+
+    @CacheEvict(value = "activitiesCache", allEntries = true)
+    public void clearCache() {
     }
 }
